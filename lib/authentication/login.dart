@@ -1,9 +1,10 @@
-import 'package:tourist_app/authentication/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:tourist_app/authentication/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -13,39 +14,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final mobileValidator = MultiValidator([
-    RequiredValidator(errorText: 'Please enter a mobile number!!'),
-    PatternValidator(r'^[6-9]\d{9}$',
-        errorText: 'Please Enter a valid 10 digit Mobile Number')
-  ]);
-
-  void navigateToRegister() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SignupPage(),
-      ),
-    );
-  }
-
-  // OTPVerification otpVerification = OTPVerification();
-  TextEditingController phone = TextEditingController();
-  bool phone_exists = false;
-
-  check_phone_exists(phoneNumber) async {
-    final databaseReference = FirebaseDatabase.instance.ref();
-    DatabaseEvent event = await databaseReference.once();
-    Map<dynamic, dynamic> databaseData = event.snapshot.value as Map;
-    if (databaseData['users'] != null) {
-      dynamic keys_list = databaseData['users'].keys.toList();
-      for (int i = 0; i < keys_list.length; i++) {
-        if (databaseData['users'][keys_list[i]].containsValue(phoneNumber)) {
-          phone_exists = true;
-        }
-      }
-    }
-  }
-
   showSnackBar() {
     final snackBar = SnackBar(
       content: const Text(
@@ -62,59 +30,37 @@ class _LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  reqPermission() async {
-    Map<ph.Permission, ph.PermissionStatus> statuses =
-        await [ph.Permission.location].request();
-    print(statuses[ph.Permission.location]);
-  }
+  login() {
+    final FirebaseAuth auth = FirebaseAuth.instance;
 
-  loginGuest() {
-    print('loginGuest called ');
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    _auth.signInAnonymously().then((result) {
-      setState(() {
-        final User? user = result.user;
-        print('guest $user');
-        //get user uid
-        final uid = user?.uid;
-        saveGuestData(uid!);
-      });
-    });
-  }
+    Future<void> signup(BuildContext context) async {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleSignInAccount =
+          await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        final AuthCredential authCredential = GoogleAuthProvider.credential(
+            idToken: googleSignInAuthentication.idToken,
+            accessToken: googleSignInAuthentication.accessToken);
 
-  saveGuestData(String uid) {
-    // print("uid2 $uid");
-    final databaseReference = FirebaseDatabase.instance.ref();
-    databaseReference.child('users').child('guests').child(uid).update({
-      'fullname': 'Guest',
-    });
-    //navigate to home page
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SignupPage(),
-      ),
-    );
-    //snackbar
-    final snackBar = SnackBar(
-      content: const Text(
-        'Welcome Guest!',
-        style: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 16,
-        ),
-      ),
-    );
-    // Find the ScaffoldMessenger in the widget tree
-    // and use it to show a SnackBar.
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // Getting users credential
+        UserCredential result = await auth.signInWithCredential(authCredential);
+        User? user = result.user;
+
+        if (result != null) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
+        } // if result not null we simply call the MaterialpageRoute,
+        // for go to the HomePage screen
+      }
+    }
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    reqPermission();
   }
 
   @override
@@ -160,14 +106,6 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   height: 24,
                 ),
-                Text(
-                  'Login',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 SizedBox(
                   height: 10,
                 ),
@@ -194,100 +132,8 @@ class _LoginPageState extends State<LoginPage> {
                     key: formKey,
                     child: Column(
                       children: [
-                        TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          // keyboardType: TextInputType.phone,
-                          // maxLength: 10,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          cursorColor: Colors.black,
-                          controller: phone,
-                          decoration: InputDecoration(
-                            label: Text('Email'),
-                            labelStyle: TextStyle(
-                              color: Colors.grey.shade700,
-                            ),
-                            errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(10)),
-                            focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(10)),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black12),
-                                borderRadius: BorderRadius.circular(10)),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black12),
-                                borderRadius: BorderRadius.circular(10)),
-                            // prefix: Padding(
-                            //   padding: EdgeInsets.symmetric(horizontal: 8),
-                            //   child: Text(
-                            //     '(+91)',
-                            //     style: TextStyle(
-                            //       fontFamily: 'Poppins',
-                            //       fontSize: 18,
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            // ),
-                            // suffixIcon: Icon(
-                            //   Icons.check_circle,
-                            //   color: Colors.green,
-                            //   size: 32,
-                            // ),
-                          ),
-                        ),
                         SizedBox(
                           height: 22,
-                        ),
-                        TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          // keyboardType: TextInputType.phone,
-                          // maxLength: 10,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          cursorColor: Colors.black,
-                          controller: phone,
-                          decoration: InputDecoration(
-                            label: Text('Password'),
-                            labelStyle: TextStyle(
-                              color: Colors.grey.shade700,
-                            ),
-                            errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(10)),
-                            focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(10)),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black12),
-                                borderRadius: BorderRadius.circular(10)),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black12),
-                                borderRadius: BorderRadius.circular(10)),
-                            // prefix: Padding(
-                            //   padding: EdgeInsets.symmetric(horizontal: 8),
-                            //   child: Text(
-                            //     '(+91)',
-                            //     style: TextStyle(
-                            //       fontFamily: 'Poppins',
-                            //       fontSize: 18,
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            // ),
-                            // suffixIcon: Icon(
-                            //   Icons.check_circle,
-                            //   color: Colors.green,
-                            //   size: 32,
-                            // ),
-                          ),
                         ),
                         SizedBox(
                           height: 22,
@@ -296,30 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              // if (formKey.currentState!.validate()) {
-                              //   check_phone_exists(phone.text).whenComplete(() {
-                              //     phone_exists
-                              //         ? otpVerification
-                              //             .verifyPhone(phone.text)
-                              //             .whenComplete(() {
-                              //             Navigator.of(context).pushReplacement(
-                              //               MaterialPageRoute(
-                              //                 builder: (context) => Otp(),
-                              //                 settings:
-                              //                     RouteSettings(arguments: []),
-                              //               ),
-                              //             );
-                              //           })
-                              //         : showSnackBar();
-                              //   });
-                              // }
-                              // showDialog(
-                              //     context: context,
-                              //     barrierDismissible: false,
-                              //     builder: (BuildContext c) {
-                              //       return ProgressDialog(
-                              //           message: 'Processing',);
-                              //     });
+                              //call login function
+                              AuthService().signInWithGoogle();
                             },
                             style: ButtonStyle(
                               foregroundColor: MaterialStateProperty.all<Color>(
@@ -336,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: Padding(
                               padding: EdgeInsets.all(14.0),
                               child: Text(
-                                'Login',
+                                'Sign in with Google',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontFamily: 'Poppins',
@@ -348,34 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(
                           height: 18,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'New user? ',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF000000),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            GestureDetector(
-                              onTap: navigateToRegister,
-                              child: Text(
-                                'Register now',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFF23F44),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
+
                         SizedBox(
                           height: 10,
                         ),

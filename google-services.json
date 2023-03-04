@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "721129491677",
+    "firebase_url": "https://tourist-app-50ae0-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "tourist-app-50ae0",
     "storage_bucket": "tourist-app-50ae0.appspot.com"
   },
@@ -22,7 +23,7 @@
           }
         },
         {
-          "client_id": "721129491677-oe83qclhrn506umj6s93tbrq6g6bhh9o.apps.googleusercontent.com",
+          "client_id": "721129491677-frghm65icg0d96d6g60q8otenakgag48.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -35,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "721129491677-oe83qclhrn506umj6s93tbrq6g6bhh9o.apps.googleusercontent.com",
+              "client_id": "721129491677-frghm65icg0d96d6g60q8otenakgag48.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
