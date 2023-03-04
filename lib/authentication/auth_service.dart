@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tourist_app/authentication/login.dart';
 import 'package:tourist_app/home.dart';
+import 'package:tourist_app/home_page.dart';
 
 class AuthService {
   //Determine if the user is authenticated.
