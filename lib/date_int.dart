@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tourist_app/matched.dart';
 
 class DateIntDialog extends StatefulWidget {
   const DateIntDialog({Key? key}) : super(key: key);
@@ -43,6 +44,56 @@ class _DateIntDialogState extends State<DateIntDialog> {
       'end_date': newEndD,
       'interests': newSelectedValues,
     });
+  }
+
+    checkMate() async {
+    // check if there is a match which has same dates and location and interests
+    final databaseReference = FirebaseDatabase.instance.ref();
+    DatabaseEvent event = await databaseReference.once();
+    Map<dynamic, dynamic> databaseData = event.snapshot.value as Map;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User user = await auth.currentUser!;
+    final uid = user.uid;
+    dynamic keys_list = databaseData['users'].keys.toList();
+
+    print(keys_list);
+
+    for (int i = 0; i < keys_list.length; i++) {
+      if (keys_list[i] != uid) {
+        print(keys_list[i]);
+        print(databaseData['users'][keys_list[i]]['plan']['start_date']);
+        print(databaseData['users'][keys_list[i]]['plan']['end_date']);
+        print(databaseData['users'][keys_list[i]]['plan']['location']);
+        print(databaseData['users'][keys_list[i]]['plan']['interests']);
+        print('-----------------');
+        if (databaseData['users'][keys_list[i]]['plan']['start_date'] ==
+                databaseData['users'][uid]['plan']['start_date'] &&
+            databaseData['users'][keys_list[i]]['plan']['end_date'] ==
+                databaseData['users'][uid]['plan']['end_date']) {
+          print('found');
+          found = true;
+          // get key of matched user
+          String matchedKey = keys_list[i];
+          print(matchedKey);
+          if (found == true) {
+            // save matchedkey in shared preferences
+            final databaseReference = FirebaseDatabase.instance.ref();
+            final FirebaseAuth auth = FirebaseAuth.instance;
+            final User user = auth.currentUser!;
+            final uid = user.uid;
+
+            databaseReference.child('users').child(uid).child('plan').update({
+              'matchedKey': matchedKey,
+            });
+
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => UserCard()));
+          }
+          print(found);
+          break;
+        }
+      }
+    }
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
