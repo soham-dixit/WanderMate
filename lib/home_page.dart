@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:tourist_app/authentication/auth_service.dart';
+import 'package:tourist_app/date_int.dart';
+import 'package:tourist_app/date_loc.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -74,7 +76,14 @@ class _HomePageState extends State<HomePage> {
             // add button
             padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return DateLocationDialog();
+                  },
+                );
+              },
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                 backgroundColor: MaterialStateProperty.all(Color(0xFFF23F44)),
@@ -101,7 +110,14 @@ class _HomePageState extends State<HomePage> {
             // add button
             padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return DateIntDialog();
+                  },
+                );
+              },
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                 backgroundColor: MaterialStateProperty.all(Color(0xFFF23F44)),
