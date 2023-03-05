@@ -7,6 +7,7 @@ import 'package:tourist_app/date_loc.dart' as date_loc;
 class UserCard extends StatefulWidget {
   @override
   State<UserCard> createState() => _UserCardState();
+  
 }
 
 class _UserCardState extends State<UserCard> {
@@ -50,7 +51,8 @@ class _UserCardState extends State<UserCard> {
     return Scaffold(
       backgroundColor: Color(0xFFFBF9F6),
       appBar: AppBar(
-        title: const Text('Flutter Card with image and text'),
+        backgroundColor: Color(0xFFF23F44),
+        title: const Text('You have found a match!'),
       ),
       body: Card(
         shape: RoundedRectangleBorder(
@@ -80,7 +82,7 @@ class _UserCardState extends State<UserCard> {
               contentPadding: EdgeInsets.fromLTRB(75, 0, 30, 0),
             ),
             ListTile(
-              subtitle: Text('Areas of Interest: ' + areas.toString(),
+              subtitle: Text('Areas of Interest: ' + areas.toString().substring(1, areas.toString().length - 1),
                   style: TextStyle(fontSize: 20.0, fontFamily: 'Popppins')),
               contentPadding: EdgeInsets.fromLTRB(75, 0, 30, 0),
             ),
