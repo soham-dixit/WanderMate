@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:tourist_app/authentication/auth_service.dart';
+import 'package:tourist_app/chat.dart';
 import 'package:tourist_app/date_int.dart';
 import 'package:tourist_app/date_loc.dart';
 
@@ -173,7 +174,10 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.chat_outlined),
               title: const Text('Chat with Mate'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                );
               },
             ),
             ListTile(
