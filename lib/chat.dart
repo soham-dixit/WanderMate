@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -7,8 +9,22 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textEditingController = TextEditingController();
+  String name = '';
 
   List<String> _messages = [];
+
+  fetchData() async {
+    final databaseReference = FirebaseDatabase.instance.ref();
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User user = auth.currentUser!;
+    final uid = user.uid;
+    DatabaseEvent event = await databaseReference.once();
+    Map<dynamic, dynamic> databaseData = event.snapshot.value as Map;
+
+    setState(() {
+      name = databaseData['users'][uid]['fullname'];
+    });
+  }
 
   void _handleSubmitted(String text) {
     _textEditingController.clear();
@@ -67,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text("User", style: Theme.of(context).textTheme.subtitle1),
+                Text(name, style: Theme.of(context).textTheme.subtitle1),
                 Container(
                   margin: EdgeInsets.only(top: 5.0),
                   child: Text(text),
@@ -78,6 +94,12 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
   }
 
   @override

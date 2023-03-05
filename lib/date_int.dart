@@ -83,20 +83,6 @@ class _DateIntDialogState extends State<DateIntDialog> {
     );
   }
 
-  // Widget _buildLocationSelector(String title) {
-  //   return TextFormField(
-  //     decoration: InputDecoration(
-  //       labelText: title,
-  //       border: OutlineInputBorder(),
-  //     ),
-  //     onChanged: (value) {
-  //       setState(() {
-  //         _location = value;
-  //       });
-  //     },
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
