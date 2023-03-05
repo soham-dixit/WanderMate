@@ -1,4 +1,4 @@
-# tourist_app
+# WanderMate
 
 A new Flutter project.
 
