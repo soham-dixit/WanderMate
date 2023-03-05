@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:tourist_app/chat.dart';
 import 'package:tourist_app/date_loc.dart' as date_loc;
 
 class UserCard extends StatefulWidget {
@@ -87,7 +88,12 @@ class _UserCardState extends State<UserCard> {
               contentPadding: EdgeInsets.fromLTRB(75, 0, 30, 0),
             ),
             GFButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                );
+              },
               text: "",
               // type: GFButtonType.transparent,
               type: GFButtonType.outline2x,
